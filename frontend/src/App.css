@@ -1,0 +1,14 @@
+/* App shell: WhatsApp-style two columns (sidebar | chat) */
+
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
