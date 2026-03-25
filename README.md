@@ -1,6 +1,6 @@
 # Notes App
 
-A full-stack notes web app: organize notes in groups (similar in spirit to chat threads). Users sign in with JWT-based auth; the API is built with FastAPI and SQLite.
+A full-stack notes web application that allows users to organize notes into group-based threads, similar to chat conversations. The system features a FastAPI backend with SQLite for data storage and a React frontend, secured with JWT-based authentication for user login and session management.
 
 ## Repository layout
 
