@@ -1,0 +1,142 @@
+/* Matches sidebar header actions (e.g. Log out). */
+.add-group__trigger {
+  flex-shrink: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid #2a7a2a;
+  border-radius: 4px;
+  background: #e8f5e8;
+  color: #1a5c1a;
+}
+
+.add-group__trigger:hover:not(:disabled) {
+  background: #d4edd4;
+}
+
+.add-group__trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.add-group-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.add-group-modal {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.add-group-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #ededed;
+  border-bottom: 1px solid #ddd;
+}
+
+.add-group-modal__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.add-group-modal__icon-close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #444;
+}
+
+.add-group-modal__icon-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.add-group-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.add-group-modal__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.add-group-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.55rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-group-modal__input:disabled {
+  opacity: 0.7;
+}
+
+.add-group-modal__error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #a33;
+}
+
+.add-group-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.add-group-modal__btn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+}
+
+.add-group-modal__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.add-group-modal__btn--primary {
+  border-color: #2a7a2a;
+  background: #3d8b3d;
+  color: #fff;
+}
+
+.add-group-modal__btn--primary:hover:not(:disabled) {
+  background: #357a35;
+}

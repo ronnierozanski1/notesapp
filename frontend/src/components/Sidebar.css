@@ -22,6 +22,13 @@
   min-width: 0;
 }
 
+.sidebar__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
 .sidebar__logout {
   flex-shrink: 0;
   padding: 0.35rem 0.65rem;
@@ -63,12 +70,33 @@
 }
 
 .sidebar__item {
-  padding: 0.65rem 1rem;
-  font-size: 0.9rem;
-  color: #222;
+  padding: 0;
   border-bottom: 1px solid #eaeaea;
 }
 
 .sidebar__item:last-child {
   border-bottom: none;
+}
+
+/* Full-width row button: looks like a list row, acts like a real control. */
+.sidebar__item-btn {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  text-align: left;
+  color: #222;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.sidebar__item-btn:hover {
+  background: #ececec;
+}
+
+.sidebar__item-btn--selected {
+  background: #e0e0e0;
+  font-weight: 600;
 }

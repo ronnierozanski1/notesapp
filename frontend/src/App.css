@@ -1,8 +1,8 @@
 /* App shell: WhatsApp-style two columns (sidebar | chat) */
 
 .app {
-  display: flex;
-  height: 100vh;
+  display: flex; /*make the children - <Sidebar />, <div className="app__main">) be horizontal to each other */
+  height: 100vh; /*make the app take the full height of the screen*/
   overflow: hidden;
 }
 

@@ -1,56 +1,28 @@
-import { useEffect, useState } from "react";
 import "./Sidebar.css";
+import { AddGroupBtn } from "./AddGroupBtn";
 
-function authHeaders(token) {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
-  return headers;
-}
-
-/** Left column: list of groups (chats). */
-export function Sidebar({ apiBase, token, onLogout }) {
-  const [groups, setGroups] = useState([]);
-  const [status, setStatus] = useState("idle");
-
-  useEffect(() => {
-    if (!token) return;
-
-    let cancelled = false;
-
-    async function load() {
-      setStatus("loading");
-      try {
-        const res = await fetch(`${apiBase}/api/groups`, { headers: authHeaders(token) });
-        if (res.status === 401) {
-          onLogout?.();
-          return;
-        }
-        if (!res.ok) throw new Error("Failed to load groups");
-        const data = await res.json();
-        if (!cancelled) {
-          setGroups(data);
-          setStatus("idle");
-        }
-      } catch {
-        if (!cancelled) setStatus("error");
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [apiBase, token, onLogout]);
+/** Left column: list of groups (chats). List + load state come from App (shared with note panel for MRU ordering). */
+export function Sidebar(props) {
+  const { groups, groupsStatus: status } = props;
 
   return (
     <aside className="sidebar">
       <header className="sidebar__header">
         <span className="sidebar__title">Groups</span>
-        {onLogout ? (
-          <button type="button" className="sidebar__logout" onClick={onLogout}>
-            Log out
-          </button>
-        ) : null}
+        <div className="sidebar__header-actions">
+          <AddGroupBtn
+            apiBase={props.apiBase}
+            token={props.token}
+            onLogout={props.onLogout}
+            disabled={status === "loading"}
+            onCreated={props.onGroupCreated}
+          />
+          {props.onLogout ? (
+            <button type="button" className="sidebar__logout" onClick={props.onLogout}>
+              Log out
+            </button>
+          ) : null}
+        </div>
       </header>
       <div className="sidebar__body">
         {status === "loading" ? <p className="sidebar__hint">Loading…</p> : null}
@@ -64,7 +36,18 @@ export function Sidebar({ apiBase, token, onLogout }) {
           <ul className="sidebar__list">
             {groups.map((g) => (
               <li key={g.id} className="sidebar__item">
-                {g.name}
+                <button
+                  type="button"
+                  className={
+                    "sidebar__item-btn" +
+                    (props.selectedGroup?.id === g.id ? " sidebar__item-btn--selected" : "")
+                  }
+                  onClick={() =>
+                    props.onSelectGroup?.({ id: g.id, name: g.name })
+                  }
+                >
+                  {g.name}
+                </button>
               </li>
             ))}
           </ul>

@@ -1,10 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "./App.css";
 import { Sidebar } from "./components/Sidebar";
-import { ChatArea } from "./components/ChatArea";
-import { MessageInput } from "./components/MessageInput";
+import { NotesMainArea } from "./components/NotesMainArea";
 import { Login } from "./components/Login";
-
+import { authHeaders } from "./utils";
 /**
  * In dev, use same origin + Vite proxy (see vite.config.js) so /api → FastAPI without CORS issues.
  * Override with VITE_API_BASE if the API is on another host (e.g. production).
@@ -14,24 +13,15 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 const TOKEN_STORAGE_KEY = "auth_access_token";
 
 
-function authHeaders(token) { /*add token to the headers if it exists*/
-  const headers = {
-    "Content-Type": "application/json",
-  };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  return headers;
-}
 
 /**
- * Root layout: sidebar (groups) + main column (chat + input).
- * We will add state and API calls in later steps.
+ * Root layout: sidebar (groups) + main column (notes for the selected group).
  */
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_STORAGE_KEY));
-  /** Each item: who sent it + text (for the list in ChatArea). */
-  const [messages, setMessages] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null); /*{ id, name } or null*/
+  const [groups, setGroups] = useState([]);
+  const [groupsStatus, setGroupsStatus] = useState("idle");
 
   function handleLoggedIn(accessToken) {
     localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
@@ -41,52 +31,59 @@ export default function App() {
   const handleLogout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     setToken(null);
-    setMessages([]);
+    setSelectedGroup(null);
+    setGroups([]);
+    setGroupsStatus("idle");
   }, []);
 
-  async function handleSend(text) {
-    /* just a demo of how to send a message to the server - change later*/
-    const trimmed = text.trim();
-    if (!trimmed) return; /*if the user typed nothing meaningfully, do nothing*/
+  useEffect(() => {
+    if (!token) return;
 
-    setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", text: trimmed }]);
+    let cancelled = false;
 
-    try {
-      const res = await fetch(`${API_BASE}/api/groups`, { headers: authHeaders(token) }); /*res is http response object from the browser*/
-      if (res.status === 401) { /*401 Unauthorized - invalid or missing token*/
-        handleLogout();
-        setMessages((prev) => [
-          ...prev,
-          { id: crypto.randomUUID(), role: "server", text: "Session expired. Please log in again." },
-        ]);
-        return;
+    async function load() {
+      setGroupsStatus("loading");
+      try {
+        const res = await fetch(`${API_BASE}/api/groups`, { headers: authHeaders(token) });
+        if (res.status === 401) {
+          handleLogout();
+          return;
+        }
+        if (!res.ok) throw new Error("Failed to load groups");
+        const data = await res.json();
+        if (!cancelled) {
+          setGroups(data);
+          setGroupsStatus("idle");
+        }
+      } catch {
+        if (!cancelled) setGroupsStatus("error");
       }
-      if (!res.ok) throw new Error("Bad response"); /* res.ok true if http code is 200-299, throw new error so the catch block runs */
-      const groups = await res.json(); /* reads the body from the httpresponse and converts json string to javascript object */
-      const summary =
-        groups.length === 0
-          ? "No groups yet."
-          : `Groups (${groups.length}): ${groups.map((g) => g.name).join(", ")}`;
-      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "server", text: summary }]);
-    } catch {
     }
 
-    try {
-      const res = await fetch(`${API_BASE}/api/echo`, { /*res is response object from the browser*/
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
-      });
-      if (!res.ok) throw new Error("Bad response");
-      const data = await res.json();
-      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "server", text: data.reply }]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: "server", text: "Could not reach the server. Is the backend running?" },
-      ]);
-    }
-  }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [API_BASE, token, handleLogout]);
+
+  const handleGroupCreated = useCallback((created) => {
+    setGroups((prev) => [created, ...prev]);
+    setSelectedGroup({ id: created.id, name: created.name });
+  }, []);
+
+  /** After a note is saved successfully, show that group first (most recently used). */
+  const bumpGroupToTop = useCallback((groupId) => {
+    if (groupId == null) return;
+    const needle = Number(groupId);
+    if (Number.isNaN(needle)) return;
+    setGroups((prev) => {
+      const i = prev.findIndex((g) => Number(g.id) === needle);
+      if (i < 0) return prev;
+      if (i === 0) return prev;
+      const g = prev[i];
+      return [g, ...prev.slice(0, i), ...prev.slice(i + 1)];
+    });
+  }, []);
 
   if (!token) {
     return <Login apiBase={API_BASE} onLoggedIn={handleLoggedIn} />;
@@ -94,10 +91,24 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar apiBase={API_BASE} token={token} onLogout={handleLogout} />
+      <Sidebar
+        apiBase={API_BASE}
+        token={token}
+        onLogout={handleLogout}
+        selectedGroup={selectedGroup}
+        onSelectGroup={setSelectedGroup}
+        groups={groups}
+        groupsStatus={groupsStatus}
+        onGroupCreated={handleGroupCreated}
+      />
       <div className="app__main">
-        <ChatArea messages={messages} />
-        <MessageInput onSend={handleSend} />
+        <NotesMainArea
+          selectedGroup={selectedGroup}
+          apiBase={API_BASE}
+          token={token}
+          onLogout={handleLogout}
+          onAddNoteToGroup={bumpGroupToTop}
+        />
       </div>
     </div>
   );

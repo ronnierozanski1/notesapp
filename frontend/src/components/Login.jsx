@@ -12,18 +12,18 @@ function formatApiError(detail) {
 /**
  * Sign in or create an account; parent stores the JWT from /api/login.
  */
-export function Login({ apiBase, onLoggedIn }) {
-  const [mode, setMode] = useState("login");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [busy, setBusy] = useState(false);
+export function Login(props) {
+  const [mode, setMode] = useState("login"); /*login or register*/
+  const [username, setUsername] = useState(""); /*username input*/
+  const [password, setPassword] = useState(""); /*password input*/
+  const [error, setError] = useState(null); /*error message*/
+  const [busy, setBusy] = useState(false); /*true if the user is submitting the form*/
 
   async function submitLogin() {
     setError(null);
     setBusy(true);
     try {
-      const res = await fetch(`${apiBase}/api/login`, {
+      const res = await fetch(`${props.apiBase}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -33,7 +33,7 @@ export function Login({ apiBase, onLoggedIn }) {
         setError(data.detail != null ? formatApiError(data.detail) : "Login failed");
         return;
       }
-      onLoggedIn(data.access_token);
+      props.onLoggedIn(data.access_token);
     } catch {
       setError("Could not reach the server. Is the backend running?");
     } finally {
@@ -45,7 +45,7 @@ export function Login({ apiBase, onLoggedIn }) {
     setError(null);
     setBusy(true);
     try {
-      const res = await fetch(`${apiBase}/api/register`, {
+      const res = await fetch(`${props.apiBase}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -55,7 +55,8 @@ export function Login({ apiBase, onLoggedIn }) {
         setError(data.detail != null ? formatApiError(data.detail) : "Registration failed");
         return;
       }
-      const loginRes = await fetch(`${apiBase}/api/login`, {
+      /*Auto-login after registration*/
+      const loginRes = await fetch(`${props.apiBase}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -67,7 +68,7 @@ export function Login({ apiBase, onLoggedIn }) {
         );
         return;
       }
-      onLoggedIn(loginData.access_token);
+      props.onLoggedIn(loginData.access_token);
     } catch {
       setError("Could not reach the server. Is the backend running?");
     } finally {
@@ -78,7 +79,7 @@ export function Login({ apiBase, onLoggedIn }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (busy) return;
-    if (mode === "register") void submitRegister();
+    if (mode === "register") void submitRegister(); /*void means the function returns a promise but we dont use it*/
     else void submitLogin();
   }
 

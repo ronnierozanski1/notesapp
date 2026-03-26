@@ -1,0 +1,110 @@
+/* Three sections: fixed header | scrollable messages | fixed input (NoteInput). */
+.group-notes {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #e5ddd5;
+}
+
+.group-notes__header {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  background: #c3d0c3;
+  border-bottom: 1px solid #d1d1d1;
+}
+
+/* Only this region scrolls; min-height: 0 lets flex shrink so overflow works. */
+.group-notes__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem 1rem;
+}
+
+/* Empty-state panel: no input below, body can grow without fighting flex scroll. */
+.group-notes__body--static {
+  overflow-y: auto;
+}
+
+.group-notes__hint {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.group-notes__hint--error {
+  color: #a33;
+}
+
+.group-notes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Centered date chip between days (not a message bubble). */
+.group-notes__date-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0.35rem 0 0.15rem;
+  padding: 0;
+  list-style: none;
+}
+
+.group-notes__date-label {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #455a64;
+  background: rgba(236, 239, 241, 0.98);
+  border-radius: 6px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* Full-width row; bubble aligned to the left (WhatsApp “received” side). */
+.group-notes__row {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* Bubble shrinks to content; cap width so long text wraps inside the bubble. */
+.group-notes__bubble {
+  box-sizing: border-box;
+  max-width: min(75%, 26rem);
+  width: fit-content;
+  padding: 0.45rem 0.55rem 0.35rem 0.65rem;
+  background: #dcf8c6;
+  border-radius: 8px;
+  border: 1px solid #b8e0a8;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.08);
+}
+
+.group-notes__text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #111;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Time sits in the corner of the bubble, WhatsApp-style. */
+.group-notes__time {
+  display: block;
+  margin-top: 0.2rem;
+  text-align: right;
+  font-size: 0.68rem;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1;
+  white-space: nowrap;
+}

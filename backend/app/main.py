@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel #delete after testing
 
-from .database import engine, Base
+from .database import engine, Base, migrate_sqlite_groups_activity_at
 from . import models  # noqa: F401 - needed so tables are registered
 from .routers import auth, groups, notes
 

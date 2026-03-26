@@ -1,5 +1,7 @@
 """Note API endpoints (per-group messages)."""
 
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -33,7 +35,8 @@ def create_note(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    get_user_group_or_404(db, group_id, current_user.id)
+    group = get_user_group_or_404(db, group_id, current_user.id)
+    group.activity_at = datetime.utcnow()
     db_note = models.Note(content=note_in.content, group_id=group_id)
     db.add(db_note)
     db.commit()

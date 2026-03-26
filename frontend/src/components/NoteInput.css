@@ -1,17 +1,18 @@
-.message-input {
+/* Fixed footer bar; does not scroll with messages. */
+.note-input {
   flex-shrink: 0;
   padding: 0.5rem 1rem;
   background: #f0f0f0;
   border-top: 1px solid #d1d1d1;
 }
 
-.message-input__form {
+.note-input__form {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.message-input__field {
+.note-input__field {
   flex: 1;
   padding: 0.5rem 0.75rem;
   border: 1px solid #ccc;
@@ -19,7 +20,12 @@
   font: inherit;
 }
 
-.message-input__btn {
+.note-input__field:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.note-input__btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
@@ -29,6 +35,11 @@
   cursor: pointer;
 }
 
-.message-input__btn:hover {
+.note-input__btn:hover:not(:disabled) {
   filter: brightness(1.05);
+}
+
+.note-input__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }

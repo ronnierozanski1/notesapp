@@ -16,6 +16,7 @@ class GroupResponse(GroupBase):
     id: int
     user_id: int
     created_at: datetime
+    activity_at: datetime
 
     class Config: #allows the schema to be converted to a dictionary then fastapi converts it to a json 
         from_attributes = True

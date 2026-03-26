@@ -17,11 +17,11 @@ def list_groups(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    """Return the current user's groups, newest first."""
+    """Return the current user's groups, most recently active first (see Group.activity_at)."""
     stmt = (
         select(models.Group)
         .where(models.Group.user_id == current_user.id)
-        .order_by(models.Group.created_at.desc())
+        .order_by(models.Group.activity_at.desc(), models.Group.id.desc())
     )
     return list(db.scalars(stmt).all())
 

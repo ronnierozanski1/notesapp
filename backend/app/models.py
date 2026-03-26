@@ -17,7 +17,7 @@ class User(Base):
     username = Column(String(50), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
 
-    groups = relationship("Group", back_populates="owner")
+    groups = relationship("Group", back_populates="user") #so i can do user.groups to get all groups of the user
 
 
 class Group(Base): #Each objet is one row = one group
@@ -27,10 +27,12 @@ class Group(Base): #Each objet is one row = one group
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True) #foreign key means from another table
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Bumped when a note is posted (and set on create). Used for WhatsApp-style sidebar ordering.
+    activity_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    owner = relationship("User", back_populates="groups")
+    user = relationship("User", back_populates="groups") #so i can do group.user to get the user of the group
     notes = relationship("Note", back_populates="group") #so i csn do group.notes to get all notes in the group
 
 

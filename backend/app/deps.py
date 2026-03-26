@@ -1,7 +1,6 @@
 """FastAPI dependencies (e.g. current user from JWT)."""
 
 from typing import Annotated, Optional
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
@@ -9,16 +8,17 @@ from sqlalchemy.orm import Session
 
 from .database import get_db
 from . import models
-from .security import decode_token
+from . import security
 
-security = HTTPBearer(auto_error=False)
+# Must not shadow the `security` module above — JWT helpers live on that module.
+http_bearer = HTTPBearer(auto_error=False)
 
-
+#read the request token, validate it, and return the actual user object from the database
 def get_current_user(
-    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)],
+    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(http_bearer)],
     db: Session = Depends(get_db),
 ) -> models.User:
-    if credentials is None or not credentials.credentials:
+    if credentials is None or not credentials.credentials: #there is no token in the request
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
@@ -26,7 +26,7 @@ def get_current_user(
         )
     token = credentials.credentials
     try:
-        payload = decode_token(token)
+        payload = security.decode_token(token) #payload is a dictionary with the token contents
         user_id = int(payload["sub"])
     except (JWTError, KeyError, ValueError):
         raise HTTPException(
@@ -41,4 +41,4 @@ def get_current_user(
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return user #return models.User object
